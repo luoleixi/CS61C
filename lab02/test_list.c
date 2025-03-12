@@ -24,8 +24,8 @@ int main() {
 	(*head_ptr)->val = 1;
 	(*head_ptr)->next = NULL;
 	node* last_node = *head_ptr;
-	append_node	(head_ptr, 2);
-	last_node = (*head_ptr)->next;
+	append_node	(head_ptr, 2);//Ìí¼Ó½Úµã
+	last_node = (*head_ptr)->next;//
 
 	int is_correct = list_size(head_ptr) == 2 && last_node != NULL && last_node->val == 2 &&
 						last_node->next == NULL;
