@@ -68,7 +68,7 @@ map:
     lw t2, 4(s0)        # load the size of the node's array into t2
     addi t1, t1, -4
     
-mapLoop:
+    mapLoop:
 	# wrong 2 : 
     # add t1, t1, t0      
     addi t1, t1, 4      # offset the array address by the count
@@ -102,7 +102,7 @@ mapLoop:
     mv a1, s1
 
     jal  map            # recurse
-done:
+    done:
     lw s0, 8(sp)
     lw s1, 4(sp)
     lw ra, 0(sp)
@@ -115,28 +115,29 @@ mystery:
     jr ra
 
 create_default_list:
-    addi sp, sp, -4
-    sw ra, 0(sp)
-    li s0, 0  # pointer to the last node we handled
-    li s1, 0  # number of nodes handled
-    li s2, 5  # size
-    la s3, arrays
-loop: #do...
-    li a0, 12
-    jal malloc      # get memory for the next node
-    mv s4, a0
-    li a0, 20
+    addi sp, sp, -4 #栈指针
+    sw ra, 0(sp)    #返回地址
+    li s0, 0        #节点指针
+    li s1, 0        #节点计数器
+    li s2, 5        #数组大小
+    la s3, arrays   #数组基地址
+    
+    loop: #do...    
+    li a0, 12       #分配 3 个字给节点
+    jal malloc      
+    mv s4, a0       #s4分配了 3 个字
+    li a0, 20       #数组大小为 5 个字
     jal  malloc     # get memory for this array
 
-    sw a0, 0(s4)    # node->arr = malloc
-    lw a0, 0(s4)
-    mv a1, s3
+    sw a0, 0(s4)    #s4 偏移量为 0 的位置存储数组基地址
+    lw a0, 0(s4)    
+    mv a1, s3       #将数组基地址加载到 a1 中
     jal fillArray   # copy ints over to node->arr
 
-    sw s2, 4(s4)    # node->size = size (4)
-    sw  s0, 8(s4)   # node-> next = previously created node
+    sw s2, 4(s4)    # 设置节点数组大小
+    sw s0, 8(s4)    # 设置下一节点数组地址
 
-    add s0, x0, s4  # last = node
+    add s0, x0, s4  # 更新最后节点指针
     addi s1, s1, 1  # i++
     addi s3, s3, 20 # s3 points at next set of ints
     li t6 5
@@ -146,7 +147,8 @@ loop: #do...
     addi sp, sp, 4
     jr ra
 
-fillArray: lw t0, 0(a1) #t0 gets array element
+fillArray: 
+    lw t0, 0(a1) #t0 gets array element
     sw t0, 0(a0) #node->arr gets array element
     lw t0, 4(a1)
     sw t0, 4(a0)
@@ -161,11 +163,11 @@ fillArray: lw t0, 0(a1) #t0 gets array element
 print_list:
     bne a0, x0, printMeAndRecurse
     jr ra   # nothing to print
-printMeAndRecurse:
+    printMeAndRecurse:
     mv t0, a0 # t0 gets address of current node
     lw t3, 0(a0) # t3 gets array of current node
     li t1, 0  # t1 is index into array
-printLoop:
+    printLoop:
     slli t2, t1, 2
     add t4, t3, t2
     lw a1, 0(t4) # a0 gets value in current node's array at index t1
@@ -175,7 +177,7 @@ printLoop:
     li a0, 11  # prepare for print string ecall
     ecall
     addi t1, t1, 1
-  li t6 5
+    li t6 5
     bne t1, t6, printLoop # ... while i!= 5
     li a1, '\n'
     li a0, 11
